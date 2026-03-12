@@ -7,6 +7,7 @@ import { TooltipProvider } from "./components/ui/tooltip.tsx";
 import { ClerkProvider } from "@clerk/react";
 
 const key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// console.log(`pubkey-${key}`)
 
 createRoot(document.getElementById("root")!).render(
   
