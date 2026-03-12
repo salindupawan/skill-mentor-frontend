@@ -40,7 +40,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { subjectSchema } from "@/schemas/subjectScema";
-import SubjectCard from "@/components/SubjectCard";
 
 type SubjectForm = z.infer<typeof subjectSchema>;
 

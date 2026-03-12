@@ -1,10 +1,5 @@
 import NavBar from "../components/NavBar";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Badge } from "../components/ui/badge";
-import { Award, Building, ShieldCheck } from "lucide-react";
-import Review from "../components/ui/review";
 import { Button } from "../components/ui/button";
-import ExpandableText from "../components/ExpandableText";
 import { Separator } from "../components/ui/separator";
 import SubjectCard from "../components/SubjectCard";
 import StatisticCard from "../components/StatisticCard";
