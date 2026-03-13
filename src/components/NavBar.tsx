@@ -18,7 +18,7 @@ export default function NavBar() {
           </div>
           <div className="hidden md:flex items-center justify-center gap-4">
             <NavLink to={"/"}>Home</NavLink>
-            <NavLink to={"/mentor"}>Mentors</NavLink>
+            <NavLink to={"/mentors"}>Mentors</NavLink>
             <NavLink to={"/"}>Services</NavLink>
             <NavLink to={"/"}>About</NavLink>
           </div>

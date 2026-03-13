@@ -70,7 +70,7 @@ export async function getMyEnrollments(token: string) {
   return res.json();
 }
 
-export async function getPublicMentors() {
+export async function getPublicMentors():Promise<Mentor[]> {
   const res = await fetch(`${API_BASE_URL}/api/v1/mentors`);
   if (!res.ok) throw new Error("Failed to fetch mentors");
   return res.json();
