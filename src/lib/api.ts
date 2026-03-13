@@ -65,7 +65,8 @@ export async function makePayment({
   return res.json();
 }
 
-export async function getMyEnrollments(token: string) {
+export async function getMyEnrollments(token: string):Promise<Session[]> {
+  console.log("tttttt-"+token)
   const res = await fetchWithAuth("/api/v1/sessions/enrolled", token);
   return res.json();
 }
