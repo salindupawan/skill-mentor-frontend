@@ -87,21 +87,13 @@ export default function SessionCard({ subject }: subjectProps) {
     <div className="break-inside-avoid">
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <CardTitle className="text-lg">{subject.subjectName}</CardTitle>
             </div>
             <div>
-              <Avatar className="size-16">
-                <AvatarImage
-                  alt={"name"}
-                  src={subject.subjectImageUrl}
-                  loading="lazy"
-                  width="120"
-                  height="120"
-                />
-                <AvatarFallback>A</AvatarFallback>
-              </Avatar>
+              <img src={subject.subjectImageUrl} className="aspect-square object-cover object-center rounded-full h-20" />
+              
             </div>
           </div>
         </CardHeader>
@@ -111,7 +103,7 @@ export default function SessionCard({ subject }: subjectProps) {
             <Link to={`/mentor/${subject.mentor.mentorId}`}>
             <div className="flex gap-3 cursor-pointer">
               <Avatar className="cursor-pointer size-6">
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage src={subject.mentor.profileImageUrl} />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
               <p className="font-semibold">
