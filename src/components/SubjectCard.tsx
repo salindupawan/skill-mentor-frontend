@@ -1,76 +1,102 @@
 import { GraduationCap } from "lucide-react";
 import SessionCardItem from "./SessionCardItem";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Button } from "./ui/button";
-import courseImage from "/src/assets/course1.jpeg";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Calendar } from "./ui/calendar";
-import { useState } from "react";
-import { RadioGroupChoiceCard } from "./RadioGroupChoiceCard";
 
-export default function SubjectCard() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+import type { CreateSession, Session, subjectProps } from "@/Types";
+import BookSessionDialog from "./BookSessionDialog";
+import { createNewSession } from "@/lib/api";
+import { useAuth, useUser } from "@clerk/react";
+import { PaymentEncryptor } from "@/lib/PaymentEncryptor";
+import { useNavigate } from "react-router";
+import { useState } from "react";
+
+export default function SubjectCard({ subject }: subjectProps) {
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
+  const router = useNavigate();
+  const handleBooking = async (date: Date | undefined, time: string) => {
+    console.log(date);
+    console.log(time);
+    console.log(subject.mentor.mentorId);
+    if (!date) {
+      console.error("Selece a date");
+      return;
+    }
+    if (!user) return;
+    const token = await getToken({ template: "skill-mentor-backend" });
+    if (!token) return;
+
+    const payload: CreateSession = {
+      subjectId: subject.subjectId,
+      mentorId: subject.mentor.mentorId,
+      sessionDate: date.toISOString().split("T")[0],
+      sessionStartTime: formatTo24Hour(time),
+    };
+    try {
+      if (isLoaded && isSignedIn) {
+        setIsLoading(true);
+        const res = await createNewSession({
+          token: token,
+          data: payload,
+        });
+        const json = await res.json();
+        const code = PaymentEncryptor.encrypt<Session>(json);
+        console.log(json);
+        console.log(code);
+        router(`/payment/${code}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const formatTo24Hour = (timeStr: string): string => {
+    // 1. Split "01:00" and "PM"
+    const [time, modifier] = timeStr.split(" ");
+    const [rowHours, minutes] = time.split(":");
+    let hours = rowHours;
+
+    if (hours === "12") {
+      hours = "00";
+    }
+
+    if (modifier === "PM") {
+      // Add 12 to the hours for PM times
+      hours = (parseInt(hours, 10) + 12).toString();
+    }
+
+    // Pad with a leading zero if needed (e.g., "9:00" -> "09:00")
+    return `${hours.padStart(2, "0")}:${minutes}`;
+  };
   return (
     <div className="px-2">
       <Card>
         <CardHeader>
-          <img src={courseImage} className="rounded-xl shadow-xl" alt="" />
+          <img
+            src={subject.subjectImageUrl}
+            className="rounded-xl shadow-xl"
+            alt=""
+          />
         </CardHeader>
         <CardContent>
           <div className="flex flex-col">
-            <CardTitle className="text-lg">AWS Examp prep session</CardTitle>
+            <CardTitle className="text-lg">{subject.subjectName}</CardTitle>
             <div className="text-gray-600 text-sm mt-1 mb-4">
-              Language lover and tutor of English. I specialize in AWS
-              certification preparation and have helped over 150 students
-              achieve their AWS Developer Associate certification. With my
-              background in cloud computing and software development
+              {subject.description}
             </div>
             <SessionCardItem
               icon={GraduationCap}
-              text="122 Students Enrolled"
+              text={subject.noOfEnrollments.toString() + " Enrollments"}
               iconColor="text-gray-600"
             />
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="mt-4 bg-[#4bbeff] hover:bg-[#28adfb]">
-                  Book Subject
-                </Button>
-              </DialogTrigger>
-              <DialogContent showCloseButton={false} className="sm:max-w-[650px] w-[95vw] max-h-[90vh] flex flex-col items-center justify-center overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Schedule a Session</DialogTitle>
-                </DialogHeader>
-
-                <div className="flex flex-col md:flex-row gap-6 justify-center sm:items-start items-start p-4">
-                  <div className="w-fit">
-                    <p className="text-sm font-medium mb-2">Choose Date</p>
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      className="rounded-lg border shadow-sm"
-                      
-                    />
-                  </div>
-                  <div className="w-fit">
-                    <p className="text-sm font-medium mb-2">Choose time</p>
-
-                    <RadioGroupChoiceCard />
-                  </div>
-                
-                </div>
-                <div className="w-full flex justify-end gap-3">
-                      <Button  variant={"outline"}>Close</Button>
-                      <Button disabled={true}>Save</Button>
-                  </div>
-              </DialogContent>
-            </Dialog>
+            <BookSessionDialog
+              triggerText="new booking"
+              isLoading={isLoading}
+              onSave={(date, time) => handleBooking(date, time)}
+            />
           </div>
         </CardContent>
       </Card>

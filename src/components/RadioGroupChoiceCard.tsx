@@ -1,28 +1,41 @@
 import { Field, FieldContent, FieldTitle } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 const timeSlots = [
-  { id: "10am", label: "10:00 AM" },
-  { id: "11am", label: "11:00 AM" },
-  { id: "12pm", label: "12:00 PM" },
-  { id: "01pm", label: "01:00 PM" },
+  { id: "10:00", label: "10:00 AM" },
+  { id: "11:00", label: "11:00 AM" },
+  { id: "12:00", label: "12:00 PM" },
+  { id: "13:00", label: "01:00 PM" },
 ];
 
-export function RadioGroupChoiceCard() {
-    const [timeSlot,setTimeSlot] = useState("");
-    console.log(timeSlot);
-    
+interface ChoiceCardProps {
+  value:string;
+  onChange: (v: string) => void;
+}
+
+export function RadioGroupChoiceCard({value, onChange }: ChoiceCardProps) {
+
+  // const handleValueChange = (v: string) => {
+  //   setTimeSlot(v); // Update local state (for UI/logging)
+  //   onChange(timeSlot); // Pass the value up to the parent!
+  // };
+
   return (
-    <RadioGroup className="grid grid-cols-2 gap-4 w-fit" onValueChange={(v)=>{setTimeSlot(v)}}>
+    <RadioGroup
+      className="grid grid-cols-2 gap-4 w-fit"
+      value={value}
+      onValueChange={(v) => {
+        
+        onChange(v)
+      }}
+    >
       {timeSlots.map((slot) => (
         <div key={slot.id}>
           <RadioGroupItem
-            value={slot.id}
+            value={slot.label}
             id={slot.id}
             className="peer sr-only "
-            
           />
           <label
             htmlFor={slot.id}
