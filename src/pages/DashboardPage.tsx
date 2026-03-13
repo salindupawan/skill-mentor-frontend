@@ -5,6 +5,8 @@ import { useEffect } from "react";
 
 export default function DashboardPage() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
+  // const [token,setToken] = useState();
+  
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -15,6 +17,8 @@ export default function DashboardPage() {
 
           console.log("--- CLERK JWT TOKEN ---");
           console.log(token);
+
+          // setToken(tokenF);
           console.log("-----------------------");
         } catch (err) {
           console.error("Failed to fetch token:", err);
