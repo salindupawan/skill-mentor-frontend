@@ -1,8 +1,10 @@
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Star } from "lucide-react";
+import type { ReviewProps } from "@/Types";
+import { cn } from "@/lib/utils";
 
-export default function ReviewItem() {
+export default function ReviewItem({ review }: ReviewProps) {
   return (
     <>
       <Card className="py-2 px-0">
@@ -12,29 +14,41 @@ export default function ReviewItem() {
               <Avatar className="size-7">
                 <AvatarImage
                   alt={"name"}
-                  src={"image"}
+                  src={review.reviewerProfileImageUrl}
                   loading="lazy"
                   width="120"
                   height="120"
                 />
-                <AvatarFallback>ST</AvatarFallback>
+                <AvatarFallback>{review.reviewerFirstName[0]}{review.reviewerLastName[0]}</AvatarFallback>
               </Avatar>
-              <p className="text-muted-foreground text-sm">Salindu Pawan</p>
+              <p className="text-muted-foreground text-sm">
+                {review.reviewerFirstName} {review.reviewerLastName}
+              </p>
             </div>
-            <p>
-              Salindu Pawan Salindu Pawan Salindu Pawan Salindu Pawan Salindu
-              Pawan Salindu Pawan Salindu Pawan Salindu Pawan Salindu Pawan
-            </p>
+            <p>{review.comment}</p>
             <div className="flex items-center justify-between gap-1">
-                
               <div className="flex">
-                <Star size={15} className="text-yellow-400 fill-yellow-400" />
-              <Star size={15} className="text-yellow-400 fill-yellow-400" />
-              <Star size={15} className="text-yellow-400 fill-yellow-400" />
-              <Star size={15} className="text-yellow-400 fill-yellow-400" />
-              <Star size={15} className="text-yellow-400" />
+                {/* Loop 5 times to create 5 stars */}
+                {[...Array(5)].map((_, index) => {
+                  // index starts at 0, so for a rating of 3:
+                  // index 0, 1, 2 will be filled. index 3, 4 will be empty.
+                  const isFilled = index < review.rating;
+
+                  return (
+                    <Star
+                      key={index}
+                      size={15}
+                      className={cn(
+                        "text-yellow-400",
+                        isFilled ? "fill-yellow-400" : "fill-transparent",
+                      )}
+                    />
+                  );
+                })}
               </div>
-              <div className="text-sm text-muted-foreground">20/02/2027</div>
+              <div className="text-sm text-muted-foreground">
+                {review.reviewDate.split("T")[0]}
+              </div>
             </div>
           </div>
         </CardContent>
