@@ -132,7 +132,7 @@ export default function SessionCard({ subject }: subjectProps) {
             <div className="flex flex-col gap-1">
               <div className="bg-[#7bf1f1]/40 px-4 py-2 rounded flex items-center gap-3">
                 <GraduationCap size={20} />
-                <p>{subject.noOfEnrollments} Enrollements</p>
+                <p>{subject.noOfEnrollments || 0} Enrollements</p>
               </div>
               {subject.mentor.isCertified && (
                 <div className="bg-[#7bf1f1]/40 px-4 py-2 rounded  flex items-center gap-3">

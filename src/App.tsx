@@ -11,6 +11,7 @@ import SignupPage from "./pages/SignupPage";
 import { ProtectedRoute } from "./ProtectedLayout.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import BankTransferPaymentPage from "./pages/BankTransferPaymentPage.tsx";
+import { MentorListPage } from "./pages/MentorsPage.tsx";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<SignupPage />} />
+        <Route path="/mentors" element={<MentorListPage />} />
         {/* <Route element={<ProtectedLayout />}> */}
         <Route
           path="/dashboard"
