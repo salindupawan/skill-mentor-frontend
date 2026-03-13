@@ -12,6 +12,7 @@ import SessionCardItem from "./SessionCardItem";
 import ExpandableText from "./ExpandableText";
 import { Button } from "./ui/button";
 import type { subjectProps } from "@/Types";
+import { Link } from "react-router";
 
 export default function SessionCard({ subject }: subjectProps) {
   return (
@@ -39,7 +40,8 @@ export default function SessionCard({ subject }: subjectProps) {
         <CardContent>
           <Separator className="mb-4" />
           <div className="flex flex-col gap-3">
-            <div className="flex gap-3">
+            <Link to={`/mentor/${subject.mentor.mentorId}`}>
+            <div className="flex gap-3 cursor-pointer">
               <Avatar className="cursor-pointer size-6">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
@@ -48,6 +50,7 @@ export default function SessionCard({ subject }: subjectProps) {
                 {subject.mentor.firstName} {subject.mentor.lastName}
               </p>
             </div>
+            </Link>
             <SessionCardItem
               icon={ThumbsUpIcon}
               text={`${subject.mentor.reviews.length}% Positive reviews`}
