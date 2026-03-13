@@ -1,4 +1,5 @@
 export interface Mentor {
+  mentorId:number;
   firstName: string;
   lastName: string;
   email: string;
@@ -18,6 +19,7 @@ export interface Mentor {
 }
 
 export interface Review {
+  reviewId:number;
   reviewerProfileImageUrl: string;
   comment: string;
   rating: number;
@@ -54,4 +56,19 @@ export interface ErrorResponse {
 
 export interface subjectProps{
     subject:Subject;
+}
+
+export interface MentorProps{
+  mentor:Mentor;
+}
+
+export interface ReviewProps{
+  review:Review;
+}
+
+export interface CreateSession{
+  subjectId:number;
+  mentorId:number;
+  sessionDate:string;
+  sessionStartTime:string;
 }
