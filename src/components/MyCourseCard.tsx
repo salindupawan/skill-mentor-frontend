@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 export default function MyCourseCard() {
   return (
@@ -33,15 +34,24 @@ export default function MyCourseCard() {
         <CardContent>
           <div className="flex flex-col">
             <CardTitle className="text-lg">AWS Examp prep session</CardTitle>
-          <div className="text-gray-600 mt-3 mb-2">
-            Mentor: Dr. Tharaka Sankalpa
-          </div>
-          <SessionCardItem
-            icon={Calendar}
-            text="Next session: 2/12/2023 8.30 PM"
-            iconColor="text-gray-600"
-          />
-          <Button className="mt-4 bg-[#4bbeff] hover:bg-[#28adfb]">Join Session</Button>
+            <div className="text-gray-600 mt-3 mb-2">
+              Mentor: Dr. Tharaka Sankalpa
+            </div>
+            <SessionCardItem
+              icon={Calendar}
+              text="Next session: 2/12/2023 8.30 PM"
+              iconColor="text-gray-600"
+            />
+            <Button
+              className="mt-4 bg-[#4bbeff] hover:bg-[#28adfb]"
+              onClick={()=>{
+                toast.success("hello",{
+                  position:"top-center",
+                })
+              }}
+            >
+              Join Session
+            </Button>
           </div>
         </CardContent>
       </Card>
