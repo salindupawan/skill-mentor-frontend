@@ -9,6 +9,7 @@ import { useAuth, useUser } from "@clerk/react";
 import { PaymentEncryptor } from "@/lib/PaymentEncryptor";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SubjectCard({ subject }: subjectProps) {
   const { isLoaded, isSignedIn, getToken } = useAuth();
@@ -47,7 +48,9 @@ export default function SubjectCard({ subject }: subjectProps) {
         router(`/payment/${code}`);
       }
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error)
+      toast.error(error.message);
+      
     }finally{
       setIsLoading(false);
     }

@@ -10,10 +10,79 @@ import {
 } from "lucide-react";
 import SessionCardItem from "./SessionCardItem";
 import ExpandableText from "./ExpandableText";
-import { Button } from "./ui/button";
-import type { subjectProps } from "@/Types";
+import type { CreateSession, Session, subjectProps } from "@/Types";
+import { Link, useNavigate } from "react-router";
+import BookSessionDialog from "./BookSessionDialog";
+import { PaymentEncryptor } from "@/lib/PaymentEncryptor";
+import { createNewSession } from "@/lib/api";
+import { useAuth, useUser } from "@clerk/react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SessionCard({ subject }: subjectProps) {
+  const { isLoaded, isSignedIn, getToken } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
+  const router = useNavigate();
+  const handleBooking = async (date: Date | undefined, time: string) => {
+    console.log(date);
+    console.log(time);
+    console.log(subject.mentor.mentorId);
+    if (!date) {
+      console.error("Selece a date");
+      return;
+    }
+    if (!user) return;
+    const token = await getToken({ template: "skill-mentor-backend" });
+    if (!token) return;
+
+    const payload: CreateSession = {
+      subjectId: subject.subjectId,
+      mentorId: subject.mentor.mentorId,
+      sessionDate: date.toISOString().split("T")[0],
+      sessionStartTime: formatTo24Hour(time),
+    };
+    try {
+      if (isLoaded && isSignedIn) {
+        setIsLoading(true);
+        const res = await createNewSession({
+          token: token,
+          data: payload,
+        });
+        const json = await res.json();
+        const code = PaymentEncryptor.encrypt<Session>(json);
+        console.log(json);
+        console.log(code);
+        router(`/payment/${code}`);
+      }
+    } catch (error) {
+      if(error instanceof Error)
+      toast.error(error.message);
+
+      console.log(error);
+    }finally{
+      setIsLoading(false);
+    }
+  };
+
+  const formatTo24Hour = (timeStr: string): string => {
+    // 1. Split "01:00" and "PM"
+    const [time, modifier] = timeStr.split(" ");
+    const [rowHours, minutes] = time.split(":");
+    let hours = rowHours;
+
+    if (hours === "12") {
+      hours = "00";
+    }
+
+    if (modifier === "PM") {
+      // Add 12 to the hours for PM times
+      hours = (parseInt(hours, 10) + 12).toString();
+    }
+
+    // Pad with a leading zero if needed (e.g., "9:00" -> "09:00")
+    return `${hours.padStart(2, "0")}:${minutes}`;
+  };
   return (
     <div className="break-inside-avoid">
       <Card>
@@ -39,7 +108,8 @@ export default function SessionCard({ subject }: subjectProps) {
         <CardContent>
           <Separator className="mb-4" />
           <div className="flex flex-col gap-3">
-            <div className="flex gap-3">
+            <Link to={`/mentor/${subject.mentor.mentorId}`}>
+            <div className="flex gap-3 cursor-pointer">
               <Avatar className="cursor-pointer size-6">
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>CN</AvatarFallback>
@@ -48,6 +118,7 @@ export default function SessionCard({ subject }: subjectProps) {
                 {subject.mentor.firstName} {subject.mentor.lastName}
               </p>
             </div>
+            </Link>
             <SessionCardItem
               icon={ThumbsUpIcon}
               text={`${subject.mentor.reviews.length}% Positive reviews`}
@@ -78,9 +149,12 @@ export default function SessionCard({ subject }: subjectProps) {
                 </div>
               )}
             </div>
-            <Button className="bg-[#4bbeff] hover:bg-[#28adfb]">
-              Schedule a session
-            </Button>
+            <BookSessionDialog
+                          triggerText="Schedule a session"
+                          isLoading={isLoading}
+                          onSave={(date, time) => {handleBooking(date,time)}}
+                        />
+            
           </div>
         </CardContent>
       </Card>

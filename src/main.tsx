@@ -5,6 +5,7 @@ import App from "./App.tsx";
 import { BrowserRouter } from "react-router";
 import { TooltipProvider } from "./components/ui/tooltip.tsx";
 import { ClerkProvider } from "@clerk/react";
+import { Toaster } from "./components/ui/sonner.tsx";
 
 const key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 // console.log(`pubkey-${key}`)
@@ -15,6 +16,7 @@ createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <TooltipProvider>
           <App />
+          <Toaster />
         </TooltipProvider>
       </BrowserRouter>
     </ClerkProvider>
