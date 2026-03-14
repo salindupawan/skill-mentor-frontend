@@ -2,7 +2,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { BrowserRouter } from "react-router";
 import { TooltipProvider } from "./components/ui/tooltip.tsx";
 import { ClerkProvider } from "@clerk/react";
 import { Toaster } from "./components/ui/sonner.tsx";
@@ -13,12 +12,10 @@ const key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ClerkProvider publishableKey={key} afterSignOutUrl="/">
-      <BrowserRouter>
-        <TooltipProvider>
-          <App />
-          <Toaster />
-        </TooltipProvider>
-      </BrowserRouter>
+      <TooltipProvider>
+        <App />
+        <Toaster />
+      </TooltipProvider>
     </ClerkProvider>
   </StrictMode>,
 );

@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -12,10 +12,13 @@ import { ProtectedRoute } from "./ProtectedLayout.tsx";
 import NotFoundPage from "./pages/NotFoundPage.tsx";
 import BankTransferPaymentPage from "./pages/BankTransferPaymentPage.tsx";
 import { MentorListPage } from "./pages/MentorsPage.tsx";
+import { UserSync } from "./lib/UserSync.ts";
 
 function App() {
   return (
     <>
+      <UserSync />
+      <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -55,6 +58,7 @@ function App() {
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </BrowserRouter>
     </>
   );
 }
