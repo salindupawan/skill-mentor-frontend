@@ -1,4 +1,10 @@
-import type { CreateSession, Mentor, Session, Subject } from "@/Types";
+import type {
+  CreateReview,
+  CreateSession,
+  Mentor,
+  Session,
+  Subject,
+} from "@/Types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -22,6 +28,19 @@ async function fetchWithAuth(
   }
 
   return res;
+}
+
+export async function addNewReview({
+  token,
+  data,
+}: {
+  token: string;
+  data: CreateReview;
+}) {
+  return fetchWithAuth("/api/v1/reviews", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
 
 export async function createNewSession({
@@ -65,13 +84,13 @@ export async function makePayment({
   return res.json();
 }
 
-export async function getMyEnrollments(token: string):Promise<Session[]> {
-  console.log("tttttt-"+token)
+export async function getMyEnrollments(token: string): Promise<Session[]> {
+  console.log("tttttt-" + token);
   const res = await fetchWithAuth("/api/v1/sessions/enrolled", token);
   return res.json();
 }
 
-export async function getPublicMentors():Promise<Mentor[]> {
+export async function getPublicMentors(): Promise<Mentor[]> {
   const res = await fetch(`${API_BASE_URL}/api/v1/mentors`);
   if (!res.ok) throw new Error("Failed to fetch mentors");
   return res.json();
