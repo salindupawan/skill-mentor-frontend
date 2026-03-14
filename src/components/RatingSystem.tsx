@@ -1,10 +1,13 @@
 import { Star } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-export default function RatingSystem() {
-  const [rating, setRating] = useState(0);
+interface RatingProps {
+  rating: number;
+  setRating: (value: number) => void;
+}
+
+export default function RatingSystem({ rating, setRating }: RatingProps) {
   return (
     <>
       <div className="flex">
@@ -12,6 +15,7 @@ export default function RatingSystem() {
           <Tooltip key={starIndex}>
             <TooltipTrigger asChild>
               <button
+              type="button"
                 onClick={() => setRating(starIndex)}
                 className="focus:outline-none cursor-pointer"
               >

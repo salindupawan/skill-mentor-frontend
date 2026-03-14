@@ -72,3 +72,9 @@ export interface CreateSession{
   sessionDate:string;
   sessionStartTime:string;
 }
+
+export interface CreateReview{
+  comment:string;
+  rating:number;
+  mentorId:number;
+}
