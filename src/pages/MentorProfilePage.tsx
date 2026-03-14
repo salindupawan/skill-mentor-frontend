@@ -1,21 +1,18 @@
 import NavBar from "../components/NavBar";
-import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import SubjectCard from "../components/SubjectCard";
 import StatisticCard from "../components/StatisticCard";
 import ReviewItem from "../components/ReviewItem";
-import { Input } from "../components/ui/input";
-import { Textarea } from "../components/ui/textarea";
-import RatingSystem from "../components/RatingSystem";
 import MentorHeaderSection from "@/components/MentorHeaderSection";
 import MentorAboutSection from "@/components/MentorAboutSection";
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { getMentoById } from "@/lib/api";
-import type { Mentor } from "@/Types";
+import type { Mentor, Review } from "@/Types";
+import { AddReviewForm } from "@/components/AddReviewForm";
 
 export default function MentorProfilePage() {
-  const [mentor, setMentor] = useState<Mentor>();
+  const [mentor, setMentor] = useState<Mentor | null>(null);
   const [loading, setLoading] = useState(true);
 
   const { mentorId } = useParams<{ mentorId: string }>();
@@ -26,7 +23,17 @@ export default function MentorProfilePage() {
       .then((data) => setMentor(data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [mentorIdInt]);
+
+  const handleAddNewreview = (review : Review) =>{
+    if(!mentor) return;
+
+    setMentor({
+      ...mentor,
+      reviews: [review, ...mentor.reviews]
+    });
+
+  };
 
   // 2. Calculate the Average (Total / Number of Reviews)
   // We use a fallback of 0 to avoid dividing by zero if there are no reviews
@@ -95,24 +102,15 @@ export default function MentorProfilePage() {
               <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-2">
                   {
-                    mentor.reviews.map((item)=>(
-                  <ReviewItem key={item.reviewId} review={item} />
+                    mentor.reviews.map((item,i)=>(
+                  <ReviewItem key={i} review={item} />
 
                     ))
                   }
                   
                 </div>
-                <div className="flex flex-col items-center gap-3">
-                  <p className="text-lg">Add your Review</p>
-                  <Input placeholder="name" />
-                  <Textarea
-                    placeholder="Enter your review here."
-                    className="h-40"
-                    rows={5}
-                  />
-                  <RatingSystem />
-                  <Button className="w-full mt-10">Submit</Button>
-                </div>
+                
+                <AddReviewForm mentorId={mentor.mentorId} onSuccess={handleAddNewreview} />
               </div>
             </div>
           </div>
