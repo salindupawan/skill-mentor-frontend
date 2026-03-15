@@ -32,7 +32,7 @@ export function AddReviewForm({
 
   const onSubmit = async (data: ReviewFormValues) => {
     try {
-      const token = await getToken();
+      const token = await getToken({ template: "skill-mentor-backend" });
 
       if (!token) {
         toast.error("You must be logged in to submit a review.");
