@@ -17,9 +17,7 @@ export default function SubjectCard({ subject }: subjectProps) {
   const { user } = useUser();
   const router = useNavigate();
   const handleBooking = async (date: Date | undefined, time: string) => {
-    console.log(date);
-    console.log(time);
-    console.log(subject.mentor.mentorId);
+
     if (!date) {
       console.error("Selece a date");
       return;
@@ -30,7 +28,7 @@ export default function SubjectCard({ subject }: subjectProps) {
 
     const payload: CreateSession = {
       subjectId: subject.subjectId,
-      mentorId: subject.mentor.mentorId,
+      mentorId: subject.mentor.mentorId, // Fallback to 0 if mentorId is undefined
       sessionDate: date.toISOString().split("T")[0],
       sessionStartTime: formatTo24Hour(time),
     };
