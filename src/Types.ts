@@ -78,3 +78,24 @@ export interface CreateReview{
   rating:number;
   mentorId:number;
 }
+
+export interface CreateMentorRequest{
+  firstName:string;
+  lastName:string;
+  email:string;
+  phoneNumber:string;
+  title:string;
+  profession:string;
+  company:string;
+  experienceYears:number;
+  bio:string;
+  isCertified:boolean;
+  startYear:number;
+  specializations:string;
+}
+
+export interface CreateSubjectRequest{
+  subjectName:string;
+  description:string;
+  mentorId:number;
+}
