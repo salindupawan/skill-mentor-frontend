@@ -1,385 +1,349 @@
-// import SessionCard from "@/components/sessionCard";
-
-// export default function CreateSubjectPage() {
-//   return (
-
-//   )
-// }
-
-import { useEffect, useState } from "react";
-
-import { useForm } from "react-hook-form";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import {
+  Plus,
+  Search,
+  MoreHorizontal,
+  X,
+  Eye,
+  Camera,
+  Upload,
+} from "lucide-react";
+import {
+  createNewSubject,
+  getPublicMentors,
+  getPublicSubjects,
+} from "@/lib/api";
+import type { CreateSubjectRequest, Mentor, Subject } from "@/Types";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
+import { SubjectSchema, type SubjectFormData } from "@/schemas/subjectScema";
 import { toast } from "sonner";
+import { useAuth } from "@clerk/react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+const SubjectsPage: React.FC = () => {
+  const [isAdding, setIsAdding] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const { getToken } = useAuth();
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import Logo from "/src/assets/logo.jpg";
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      const json = await getPublicSubjects();
+      setSubjects(json);
+    };
+    fetchSubjects();
+  }, []);
 
+  useEffect(() => {
+    const fetchMentors = async () => {
+      const json = await getPublicMentors();
+      setMentors(json);
+    };
+    fetchMentors();
+  }, []);
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  const filtered = useMemo(() => {
+    return subjects.filter(
+      (s) =>
+        s.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.mentor?.firstName.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [searchTerm, subjects]);
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { subjectSchema } from "@/schemas/subjectScema";
-
-type SubjectForm = z.infer<typeof subjectSchema>;
-
-type Mentor = {
-  id: string;
-  firstName: string;
-  lastName: string;
-};
-
-type Subject = {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-};
-
-export default function CreateSubjectPage() {
-  const [mentors, setMentors] = useState<Mentor[]>([
-    {
-      id:"1",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"2",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"3",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"4",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"5",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"6",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"7",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-    {
-      id:"8",
-      firstName:"salindu",
-      lastName:"pawan"
-    },
-  ]);
-  const [subjects, setSubjects] = useState<Subject[]>([
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-    {
-      id:"2",
-      name:"sp",
-      description:"wwe",
-      imageUrl:"erer"
-    },
-  ]);
-
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-
+  // 1. React Hook Form Setup with explicit Generics
   const {
     register,
     handleSubmit,
-    setValue,
     watch,
+    setValue,
+    reset,
     formState: { errors },
-  } = useForm<SubjectForm>({
-    resolver: zodResolver(subjectSchema),
+  } = useForm<SubjectFormData>({
+    resolver: zodResolver(SubjectSchema),
+    defaultValues: { 
+      name: "", 
+      description: "", 
+      mentorId: "", // Cast string to number to satisfy schema type
+      image: undefined 
+    },
   });
 
-  const formValues = watch();
+  const watchedValues = watch();
 
-  // FETCH MENTORS
-
-  useEffect(() => {
-    fetch("/api/v1/mentors")
-      .then((res) => res.json())
-      .then((data) => setMentors(data))
-      .catch(() => toast.error("Failed to load mentors"));
-  }, []);
-
-  // FETCH SUBJECTS
-
-  useEffect(() => {
-    fetch("/api/v1/subjects")
-      .then((res) => res.json())
-      .then((data) => setSubjects(data))
-      .catch(() => toast.error("Failed to load subjects"));
-  }, []);
-
-  // IMAGE PICKER
-
-  const handleImage = (e: any) => {
-    const file = e.target.files[0];
-
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-
-      const preview = URL.createObjectURL(file);
-
-      setImagePreview(preview);
+      setValue("image", file, { shouldValidate: true });
+      if (previewUrl) URL.revokeObjectURL(previewUrl); // Clean up old memory
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
-  // SUBMIT
+  const handleOnSuccess = (newSubject: Subject) => {
+    setSubjects((prev) => [...prev, newSubject]);
+  };
 
-  const onSubmit = async (data: SubjectForm) => {
+  // 2. Typed Submit Handler
+  const onSubmit: SubmitHandler<SubjectFormData> = async (data) => {
+    setIsSubmitting(true);
     try {
-      const formData = new FormData();
+      const token = await getToken({ template: "skill-mentor-backend" });
 
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, String(value));
-      });
-
-      if (imageFile) {
-        formData.append("image", imageFile);
+      if (!token) {
+        toast.error("You must be logged in to perform this action.");
+        return;
       }
 
-      const res = await fetch("/api/add-subject", {
-        method: "POST",
-        body: formData,
+      const payLoad: CreateSubjectRequest = {
+        subjectName: data.name,
+        description: data.description,
+        mentorId: Number(data.mentorId), // Ensure mentorId is a number
+      };
+
+      const resp = await createNewSubject({
+        token,
+        data: payLoad,
+        file: data.image,
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to create subject");
+      if (!resp.ok) {
+        throw new Error("Subject creation failed. Please try again.");
       }
 
+      const json = await resp.json();
+      handleOnSuccess(json);
       toast.success("Subject created successfully");
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong");
+      
+      // Reset everything
+      reset();
+      setPreviewUrl("");
+      setIsAdding(false);
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <section>
-      <div className="py-16 md:py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-start">
-            <h2 className="text-4xl font-semibold">Create a new Subject</h2>
+    <div className="min-h-screen bg-white p-6 md:p-10 text-slate-900">
+      <div className="w-full lg:w-6xl">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-10 border-b pb-8">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-semibold tracking-tight">Subjects</h1>
+            <p className="text-sm text-slate-500">Manage curriculum and platform courses.</p>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2  gap-6 mt-20">
+          <button
+            onClick={() => setIsAdding(true)}
+            className="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors gap-2"
+          >
+            <Plus size={16} /> Add Subject
+          </button>
+        </div>
 
-             <Card className="w-xl">
-              <CardHeader>
-                <CardTitle>Create Subject</CardTitle>
-              </CardHeader>
+        {/* Search */}
+        <div className="relative mb-8 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <input
+            type="text"
+            placeholder="Filter subjects..."
+            className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-10 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
-              <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                  <div className="space-y-4">
-                    <Label>Subject Name</Label>
-
-                    <Input {...register("name")} />
-
-                    <p className="text-red-500 text-sm">
-                      {errors.name?.message}
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label>Description</Label>
-
-                    <Textarea {...register("description")} />
-
-                    <p className="text-red-500 text-sm">
-                      {errors.description?.message}
-                    </p>
-                  </div>
-
-                  {/* IMAGE PICKER */}
-
-                  <div className="space-y-4">
-                    <Label>Course Image</Label>
-
-                    <Input
-                    
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImage}
-                    />
-                  </div>
-
-                  {/* MENTOR SELECT */}
-
-                  <div className="space-y-4 ">
-                    <Label>Select Mentor</Label>
-
-                    <Select
-                    
-                      onValueChange={(value) => setValue("mentorId", value)}
-                    
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select mentor" />
-                      </SelectTrigger>
-
-                      <SelectContent>
-                        {mentors.map((mentor) => (
-                          <SelectItem key={mentor.id} value={mentor.id}>
-                            {mentor.firstName} {mentor.lastName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <p className="text-red-500 text-sm">
-                      {errors.mentorId?.message}
-                    </p>
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Create Subject
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-            <Card className="shadow-lg w-full">
-              <CardHeader>
-                <CardTitle>Subject Preview</CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                {imagePreview && (
-                  <img
-                    src={imagePreview}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                )}
-
-                <h2 className="text-xl font-bold">
-                  {formValues.name}
-                </h2>
-
-                <p className="text-gray-600">
-                  {formValues.description}
-                </p>
-              </CardContent>
-            </Card>
-           
-
-           
-            {/* PREVIEW */}
-          </div>
-          <div className="flex flex-col w-full  rounded-2xl mt-10 ">
-            <p className="text-xl my-5 font-bold">Subjects</p>
-
-          <Table>
-
-            <TableHeader>
-              <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-
-              {subjects.map((subject)=>(
-                <TableRow key={subject.id}>
-
-                  <TableCell>
-                    <img
-                      src={Logo}
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  </TableCell>
-
-                  <TableCell>{subject.name}</TableCell>
-
-                  <TableCell className="max-w-xs truncate">
-                    {subject.description}
-                  </TableCell>
-
-                </TableRow>
-              ))}
-
-            </TableBody>
-
-          </Table>
-
-        
-          </div>
+        {/* Subjects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((subject) => (
+            <SubjectCard key={subject.subjectId} subject={subject} />
+          ))}
         </div>
       </div>
-    </section>
+
+      {/* Drawer */}
+      {isAdding && (
+        <div className="fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm flex justify-end">
+          <div className="h-full w-full sm:max-w-xl bg-white border-l shadow-2xl overflow-y-auto animate-in slide-in-from-right duration-300">
+            <div className="sticky top-0 bg-white z-10 flex items-center justify-between p-6 border-b">
+              <h2 className="text-lg font-semibold italic flex items-center gap-2">
+                <Plus size={18} /> New Subject
+              </h2>
+              <button
+                onClick={() => setIsAdding(false)}
+                className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-8 pb-24">
+              {/* Live Preview */}
+              <div className="space-y-3">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <Eye size={12} /> Live Card Preview
+                </p>
+                <div className="border rounded-xl p-4 bg-slate-50/50">
+                  <div className="max-w-[300px] mx-auto scale-95 origin-top">
+                    <SubjectCard
+                      subject={{
+                        subjectId: 0,
+                        subjectName: watchedValues.name || "Subject Title",
+                        description: watchedValues.description || "Description will appear here...",
+                        subjectImageUrl: previewUrl || "https://placehold.co/400x250?text=Cover+Preview",
+                        noOfEnrollments: 0,
+                        mentor: mentors[0] || {
+                          mentorId: 0,
+                          firstName: "",
+                          lastName: "",
+                          email: "",
+                          phoneNumber: "",
+                          title: "",
+                          profession: "",
+                          company: "",
+                          experienceYears: 0,
+                          bio: "",
+                          profileImageUrl: "",
+                          isCertified: false,
+                          startYear: 0,
+                          specialization: "",
+                          totalStudents: 0,
+                          subjects: [],
+                          reviews: []
+                        },
+                      }}
+                      isPreview
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Form */}
+              <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Subject Name</label>
+                  <input
+                    {...register("name")}
+                    className={`flex h-10 w-full rounded-md border px-3 text-sm outline-none focus:ring-2 ${errors.name ? "border-red-500 focus:ring-red-200" : "border-slate-200 focus:ring-slate-950"}`}
+                  />
+                  {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Subject Description</label>
+                  <textarea
+                    rows={5}
+                    {...register("description")}
+                    className={`flex w-full rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 ${errors.description ? "border-red-500 focus:ring-red-200" : "border-slate-200 focus:ring-slate-950"}`}
+                  />
+                  {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Assign Mentor</label>
+                  <select
+                    {...register("mentorId")}
+                    className={`flex h-10 w-full rounded-md border px-3 text-sm outline-none bg-white focus:ring-2 transition-all ${errors.mentorId ? "border-red-500 focus:ring-red-200" : "border-slate-200 focus:ring-slate-950"}`}
+                  >
+                    <option value="">Select a mentor</option>
+                    {mentors.map((mentor) => (
+                      <option key={mentor.mentorId} value={`${mentor.mentorId}`}>
+                        {mentor.firstName} {mentor.lastName}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.mentorId && <p className="text-xs text-red-500">{errors.mentorId.message}</p>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Subject Image</label>
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-full border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden">
+                      {previewUrl ? (
+                        <img src={previewUrl} className="h-full w-full object-cover" alt="Preview" />
+                      ) : (
+                        <Camera className="text-slate-300" size={24} />
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-2 px-3 py-2 border rounded-md text-xs font-semibold hover:bg-slate-50"
+                    >
+                      <Upload size={14} /> Upload Photo
+                    </button>
+                  </div>
+                  {errors.image && <p className="text-xs text-red-500">{errors.image.message as string}</p>}
+                </div>
+
+                <div className="pt-6 border-t flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsAdding(false)}
+                    className="flex-1 rounded-md border px-4 py-2 text-sm font-medium hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-md"
+                  >
+                    {isSubmitting ? "Creating..." : "Create Subject"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
-}
+};
 
+// Reusable Subject Card Component
+const SubjectCard = ({ subject, isPreview = false }: { subject: Subject; isPreview?: boolean }) => (
+  <div className={`group rounded-lg border border-slate-200 bg-white text-slate-950 shadow-sm transition-all mx-auto ${!isPreview && "hover:shadow-md"}`}>
+    <div className="aspect-video w-full overflow-hidden rounded-t-lg border-b bg-slate-100">
+      <img
+        src={subject.subjectImageUrl}
+        alt={subject.subjectName}
+        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+      />
+    </div>
+    <div className="p-4 space-y-2">
+      <span className="inline-flex items-center rounded-full border border-slate-100 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+        {subject.noOfEnrollments} Enrollments
+      </span>
+      <h3 className="font-semibold leading-tight text-md">{subject.subjectName}</h3>
+      <p className="text-xs text-slate-500 line-clamp-2">{subject.description}</p>
+      {!isPreview && (
+        <div className="flex items-center justify-between pt-2 border-t mt-2">
+          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-600">
+            <div className="h-5 w-5 rounded-full bg-slate-900 text-white flex items-center justify-center uppercase">
+              {subject.mentor?.firstName.charAt(0)}
+            </div>
+            {subject.mentor?.firstName} {subject.mentor?.lastName}
+          </div>
+          <MoreHorizontal size={14} className="text-slate-400" />
+        </div>
+      )}
+    </div>
+  </div>
+);
 
+export default SubjectsPage;

@@ -1,6 +1,8 @@
 import type {
+  CreateMentorRequest,
   CreateReview,
   CreateSession,
+  CreateSubjectRequest,
   Mentor,
   Session,
   Subject,
@@ -16,7 +18,6 @@ async function fetchWithAuth(
   const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       ...options.headers,
     },
@@ -40,6 +41,9 @@ export async function addNewReview({
   return fetchWithAuth("/api/v1/reviews", token, {
     method: "POST",
     body: JSON.stringify(data),
+    headers:{
+      "Content-Type": "application/json",
+    }
   });
 }
 
@@ -53,7 +57,29 @@ export async function createNewSession({
   return fetchWithAuth("/api/v1/sessions", token, {
     method: "POST",
     body: JSON.stringify(data),
+    headers:{
+      "Content-Type": "application/json",
+    }
   });
+}
+
+export async function createNewMentor({token, data, file}:{token:string, data:CreateMentorRequest, file:File}){
+  const formData = new FormData();
+  formData.append("details", new Blob([JSON.stringify(data)],{type:"application/json"}))
+  formData.append("image",file);
+  return fetchWithAuth("/api/v1/mentors", token,{
+    method:"POST",
+    body:formData,
+  })
+}
+export async function createNewSubject({token, data, file}:{token:string, data:CreateSubjectRequest, file:File}){
+  const formData = new FormData();
+  formData.append("details", new Blob([JSON.stringify(data)],{type:"application/json"}))
+  formData.append("image",file);
+  return fetchWithAuth("/api/v1/subjects", token,{
+    method:"POST",
+    body:formData,
+  })
 }
 
 export async function makePayment({

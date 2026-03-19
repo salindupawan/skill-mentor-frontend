@@ -13,6 +13,7 @@ import NotFoundPage from "./pages/NotFoundPage.tsx";
 import BankTransferPaymentPage from "./pages/BankTransferPaymentPage.tsx";
 import { MentorListPage } from "./pages/MentorsPage.tsx";
 import { UserSync } from "./lib/UserSync.ts";
+import ManageBookingsPage from "./pages/ManageBookingPage.tsx";
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="/admin/mentor" element={<CreateMentorPage />} />
           <Route path="/admin/subject" element={<CreateSubjectPage />} />
+          <Route path="/admin/booking" element={<ManageBookingsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
