@@ -3,6 +3,7 @@ import {
   IconChartBar,
   IconDashboard,
   IconListDetails,
+  IconUser,
 } from "@tabler/icons-react";
 import Logo from "/src/assets/logo.jpg";
 import { NavMain } from "@/components/nav-main";
@@ -17,6 +18,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import {  useUser } from "@clerk/react";
+import { Link } from "react-router";
 
 
 const data = {
@@ -29,12 +31,12 @@ const data = {
     {
       title: "Mentors",
       url: "/admin/mentor",
-      icon: IconListDetails,
+      icon: IconUser,
     },
     {
       title: "Subjects",
       url: "/admin/subject",
-      icon: IconChartBar,
+      icon: IconListDetails,
     },
     {
       title: "Bookings",
@@ -68,10 +70,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <Link to="/">
                 <img src={Logo} className="h-7 w-7 rounded-2xl" />
                 <span className="text-base font-semibold">SkillMentor</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

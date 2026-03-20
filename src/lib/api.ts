@@ -1,9 +1,11 @@
 import type {
+  AnalyticsData,
   CreateMentorRequest,
   CreateReview,
   CreateSession,
   CreateSubjectRequest,
   Mentor,
+  PatchSessionRequest,
   Session,
   Subject,
 } from "@/Types";
@@ -45,6 +47,26 @@ export async function addNewReview({
       "Content-Type": "application/json",
     }
   });
+}
+
+export async function getAllSessions(token: string): Promise<Session[]> {
+  const res = await fetchWithAuth("/api/v1/sessions", token);
+  return res.json();
+}
+export async function getAnalytics(token: string): Promise<AnalyticsData> {
+  const res = await fetchWithAuth("/api/v1/admin/analytics", token);
+  return res.json();
+}
+export async function updateSession(token: string, data:PatchSessionRequest, sessionId: number): Promise<Session> {
+  console.log(JSON.stringify(data));
+  const res = await fetchWithAuth(`/api/v1/sessions/${sessionId}`, token, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+    headers:{
+      "Content-Type": "application/json",
+    }
+  });
+  return res.json();
 }
 
 export async function createNewSession({

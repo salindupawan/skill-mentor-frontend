@@ -47,6 +47,7 @@ const MentorManagement: React.FC = () => {
   const { getToken } = useAuth();
   const [fileObject, setFileObject] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [isFetching, setIsFetching] = useState<boolean>(true);
 
   // Form State & Errors
   const initialFormState: CreateMentor = {
@@ -73,8 +74,10 @@ const MentorManagement: React.FC = () => {
   useEffect(() => {
     const fetchMentors = async () => {
       try {
+        setIsFetching(true);
         const resp = await getPublicMentors();
         setMentors(resp);
+        setIsFetching(false);
       } catch (error) {
         if (error instanceof Error) toast.error(error.message);
       }
@@ -230,9 +233,17 @@ const MentorManagement: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((mentor) => (
+          { !isFetching ? filtered.map((mentor) => (
             <MentorCard key={mentor.mentorId} mentor={mentor} />
-          ))}
+          )) : (
+            Array(6).fill({}).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-lg border border-slate-200 bg-white p-4">
+                <div className="mb-4 h-32 w-full rounded-md bg-slate-200" />
+                <div className="h-4 w-3/4 rounded-md bg-slate-200 mb-2" />
+                <div className="h-3 w-1/2 rounded-md bg-slate-200" />
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -348,7 +359,7 @@ const MentorManagement: React.FC = () => {
                 {/* Professional Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
-                    label="Title (e.g. Dr.)"
+                    label="Title"
                     name="title"
                     value={formData.title}
                     error={errors.title}
