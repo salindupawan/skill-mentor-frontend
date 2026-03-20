@@ -1,33 +1,16 @@
 import MyCourses from "@/components/MyCourses";
 import NavBar from "@/components/NavBar";
-import { useAuth } from "@clerk/react";
-import { useEffect } from "react";
+import { useUser } from "@clerk/react";
+import { Navigate } from "react-router";
 
 export default function DashboardPage() {
-  const { getToken, isLoaded, isSignedIn } = useAuth();
-  // const [token,setToken] = useState();
+    const { user } = useUser();
+
+    const userRole = user?.publicMetadata?.roles as string[] || [];
+    if(user && userRole.includes("ADMIN")){
+      return <Navigate to="/admin" replace />;
+    }
   
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      if (isLoaded && isSignedIn) {
-        try {
-          // 2. Fetch the specific template you created for Spring Boot
-          const token = await getToken({ template: "skill-mentor-backend" });
-
-          console.log("--- CLERK JWT TOKEN ---");
-          console.log(token);
-
-          // setToken(tokenF);
-          console.log("-----------------------");
-        } catch (err) {
-          console.error("Failed to fetch token:", err);
-        }
-      }
-    };
-    fetchToken();
-  }, [isLoaded, isSignedIn, getToken]);
-
   return (
     <>
       <NavBar />

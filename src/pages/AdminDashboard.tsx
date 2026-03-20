@@ -20,7 +20,6 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const colours = ["bg-green-500", "bg-blue-500", "bg-purple-500"];
 
-
   useEffect(() => {
     const fetchAnalytics = async () => {
       const token = await getToken();
@@ -137,8 +136,8 @@ const AdminDashboard = () => {
                 {(!analyticsData
                   ? Array(5).fill({})
                   : analyticsData.recentBookings
-                ).map((booking) => (
-                  <tr key={booking.id} className="hover:bg-slate-50 transition">
+                ).map((booking, index) => (
+                  <tr key={index} className="hover:bg-slate-50 transition">
                     <td className="px-6 py-4 text-sm font-medium text-slate-700">
                       {isLoading ? (
                         <Skeleton className="h-4 w-24 mb-2" />
@@ -191,22 +190,22 @@ const AdminDashboard = () => {
           </div>
 
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-            <h3 className="font-bold text-slate-800 mb-4">Top Performing Subjects</h3>
-            {
-              analyticsData ? (
-                <div className="flex items-center gap-4 mb-6 text-green-600">
-              <TrendingUp size={32} />
-              <div>
-                <p className="text-2xl font-bold">84%</p>
-                <p className="text-xs text-slate-500">
-                  This Month Enrollments
-                </p>
+            <h3 className="font-bold text-slate-800 mb-4">
+              Top Performing Subjects
+            </h3>
+            {analyticsData ? (
+              <div className="flex items-center gap-4 mb-6 text-green-600">
+                <TrendingUp size={32} />
+                <div>
+                  <p className="text-2xl font-bold">84%</p>
+                  <p className="text-xs text-slate-500">
+                    This Month Enrollments
+                  </p>
+                </div>
               </div>
-            </div>
-              ):(
-                <Skeleton className="h-10 w-44 mb-4 mt-6" />
-              )
-            }
+            ) : (
+              <Skeleton className="h-10 w-44 mb-4 mt-6" />
+            )}
             <div className="space-y-4">
               {analyticsData
                 ? analyticsData.topEnrollments.map((subject, i) => (
@@ -222,10 +221,10 @@ const AdminDashboard = () => {
                 : Array(3)
                     .fill({})
                     .map((_, i) => (
-                      <>
-                        <Skeleton key={i} className="h-3 w-44 mb-1" />
-                        <Skeleton key={i} className="h-3 w-full mb-3" />
-                      </>
+                      <div key={i} className="space-y-1">
+                        <Skeleton className="h-3 w-44 mb-1" />
+                        <Skeleton className="h-3 w-full mb-3" />
+                      </div>
                     ))}
             </div>
           </div>
