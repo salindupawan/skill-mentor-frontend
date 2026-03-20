@@ -45,6 +45,9 @@ export interface Session {
   sessionImageUrl: string;
   sessionDate: string;
   startTime: string;
+  studentName: string;
+  PaymentStatus: string;
+  paymentProofLink: string;
 }
 
 export interface ErrorResponse {
@@ -98,4 +101,30 @@ export interface CreateSubjectRequest{
   subjectName:string;
   description:string;
   mentorId:number;
+}
+
+export interface PatchSessionRequest{ 
+  meetingLink?:string;
+  sessionStatus?:string;
+  paymentStatus?:string;
+}
+
+export interface Booking {
+  studentName: string;
+  paymentStatus: string;
+  subjectName: string;
+}
+
+export interface EnrollmentStats {
+  subjectName: string;
+  count: number;
+}
+
+export interface AnalyticsData {
+  totalStudents: number;
+  activeMentors: number;
+  totalBookings: number;
+  pendingPayments: number;
+  topEnrollments: EnrollmentStats[];
+  recentBookings: Booking[];
 }
