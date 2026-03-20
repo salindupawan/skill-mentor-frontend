@@ -21,7 +21,6 @@ export const ProtectedRoute = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   const userRole = user?.publicMetadata?.roles as string[] || [];
-  console.log(userRole);
   if (requiredRole && !userRole.includes(requiredRole)) {
     console.warn(
       `Access denied. Required: ${requiredRole}, Found: ${userRole}`,
