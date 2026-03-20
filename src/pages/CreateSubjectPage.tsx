@@ -30,11 +30,14 @@ const SubjectsPage: React.FC = () => {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const { getToken } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchSubjects = async () => {
+      setIsLoading(true);
       const json = await getPublicSubjects();
       setSubjects(json);
+      setIsLoading(false);
     };
     fetchSubjects();
   }, []);
@@ -162,9 +165,17 @@ const SubjectsPage: React.FC = () => {
 
         {/* Subjects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((subject) => (
+          {!isLoading ? filtered.map((subject) => (
             <SubjectCard key={subject.subjectId} subject={subject} />
-          ))}
+          )) : (
+            Array(6).fill({}).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-lg border border-slate-200 bg-white p-4">
+                <div className="mb-4 h-32 w-full rounded-md bg-slate-200" />
+                <div className="h-4 w-3/4 rounded-md bg-slate-200 mb-2" />
+                <div className="h-3 w-1/2 rounded-md bg-slate-200" />
+              </div>
+            ))
+          )}
         </div>
       </div>
 
